@@ -5,7 +5,7 @@
     {
       "name": "ctf-kit",
       "description": "AI-assisted CTF toolkit (MysterionRise/ctf-kit). Unreviewed upstream plugin: read it before installing.",
-      "source": { "source": "github", "repo": "MysterionRise/ctf-kit" }
+      "source": { "source": "url", "url": "https://github.com/MysterionRise/ctf-kit.git" }
     }
   ]
 }

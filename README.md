@@ -15,6 +15,8 @@ efficiently during the event.
 | [docs/local-session-integration.md](docs/local-session-integration.md) | Browser-inspection extensions (OpenTabs) for console/network on an authenticated challenge site |
 | [docs/high-level-automation.md](docs/high-level-automation.md) | Structural command abstractions (browser-use) vs. raw E2E scripts |
 | [docs/ctf-kit-setup.md](docs/ctf-kit-setup.md) | Installing & initializing MysterionRise/ctf-kit + its benign file-analysis components |
+| [docs/TEAM-SETUP.md](docs/TEAM-SETUP.md) | **Start here:** full teammate setup (ctf-kit, plugin, OpenTabs) |
+| [docs/TEAM-PROMPT.md](docs/TEAM-PROMPT.md) | Paste-ready prompt that has Claude walk you through the setup |
 
 ## Scope & ground rules
 
