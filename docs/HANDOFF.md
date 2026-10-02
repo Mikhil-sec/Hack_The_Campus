@@ -30,6 +30,7 @@ Teammate onboarding: `docs/TEAM-SETUP.md` and `docs/TEAM-PROMPT.md`.
 | WSL Ubuntu | Present, stopped, analysis tools **not** installed (see `docs/SETUP-CHECKLIST.md` step 2) |
 | ctf-kit **plugin** | **Installed** (v1.1.0, `ctf-kit@hack-the-campus`); `/ctf-kit:*` commands listed in sessions. Upstream reviewed at commit `dc2bc35`; the marketplace entry is not pinned to it (tracks upstream HEAD) |
 | Git | Everything committed and pushed to `origin/main` |
+| Lab network | Verified 2026-10-02: laptop is on the offline lab Wi-Fi (router has no internet, confirmed) and on a USB-tethered phone for internet at the same time. Windows routes lab traffic over Wi-Fi and everything else over the phone with no changes needed. The lab site answers HTTP 200 from here. Full chain verified: guest Chrome tab on the lab site, read via OpenTabs (tab info + console logs). Method and optional metric hardening: `docs/TEAM-SETUP.md` section 6b. The lab address and SSID are shared by the team lead, not stored in this repo |
 | Still open | WSL analysis tools not installed (`docs/SETUP-CHECKLIST.md` step 2), so most ctf-kit skills will report missing tools. Optionally pin the plugin to `dc2bc35` in `.claude-plugin/marketplace.json` |
 
 ## Runbook — (re)connect the OpenTabs MCP (DONE once; repeat after reboot or app restart)

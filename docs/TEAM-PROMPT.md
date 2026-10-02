@@ -9,7 +9,14 @@ I'm setting up my machine for our team's authorized, lab-only educational CTF.
 Read CLAUDE.md, docs/HANDOFF.md and docs/TEAM-SETUP.md in this repo, then give me
 a 3-4 line summary of what we're setting up.
 
-Then walk me through docs/TEAM-SETUP.md one step at a time (steps 0-6):
+Then walk me through docs/TEAM-SETUP.md one step at a time (steps 0-6, plus
+6b, the lab network section). The lab website sits behind an offline Wi-Fi
+router and I get internet through my phone, so for 6b only run the read-only
+checks (ipconfig, route print, Find-NetRoute, Test-NetConnection) against the
+lab address I give you. Never change routes or adapter settings yourself; give me
+the exact command to run as Administrator.
+
+For each step:
 - Before each step, check what is already done on this machine (read-only
   checks only: versions, status commands, whether files or env vars exist) and
   skip what is complete.

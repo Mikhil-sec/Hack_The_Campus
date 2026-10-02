@@ -152,6 +152,88 @@ the one lab tab you are debugging, then turn it back off.
 Chrome blocks debugger access on `chrome://` pages (including the New Tab page),
 so test on a real `http(s)` page, not a blank tab.
 
+## 6b. Lab network: offline router + internet at the same time
+
+The lab website runs behind a Wi-Fi router with **no internet**. Claude needs
+internet, so every laptop needs two links at once:
+
+1. **Lab link:** Wi-Fi to the lab router (ask the team lead for the SSID and the lab
+   site address, shown below as `<LAB_SITE_IP>`).
+2. **Internet link:** your own phone via **USB tethering** (or a hotspot / second
+   adapter). Each person needs their own; don't share one phone between laptops.
+
+Windows usually handles this by itself: the lab subnet is a more specific route
+than the default route, so lab traffic goes to the router and everything else
+goes out the phone. Check it instead of assuming.
+
+**Order:** connect the lab Wi-Fi first, then plug in the phone. Turn off any
+setting that drops a Wi-Fi network for having no internet.
+
+### Check it (read-only, nothing changes)
+
+```powershell
+ipconfig /all
+route print -4
+Find-NetRoute -RemoteIPAddress <LAB_SITE_IP>   | Select-Object -First 1 InterfaceAlias,IPAddress
+Find-NetRoute -RemoteIPAddress 1.1.1.1         | Select-Object -First 1 InterfaceAlias,IPAddress
+Test-NetConnection <LAB_SITE_IP> -Port 80
+Test-NetConnection claude.ai -Port 443
+```
+
+What good looks like:
+
+| Check | Expected |
+|-------|----------|
+| Route to the lab site | the **Wi-Fi** adapter |
+| Route to 1.1.1.1 / `claude.ai` | the **phone** adapter (often "Remote NDIS", "Ethernet N") |
+| Lab site port 80 | `TcpTestSucceeded : True` |
+| `claude.ai:443` | `TcpTestSucceeded : True` |
+| Subnets | the lab subnet and the phone subnet **differ** |
+
+### If something is off
+
+| Symptom | Likely cause and fix |
+|---------|----------------------|
+| Both subnets look the same (overlap) | Rare, and Windows can't tell the networks apart. Change the phone's or router's range, or ask the team lead |
+| Lab site loads, but the internet drops when the phone link blips | Wi-Fi's backup default route points at the dead-end router. Prefer the phone with the metrics below |
+| Lab site by **name** fails or is slow | Each link has its own DNS. Use the IP, or add a line to `C:\Windows\System32\drivers\etc\hosts` (as Administrator) |
+| Windows disconnects the lab Wi-Fi | Turn off auto-switch for no-internet Wi-Fi and keep "connect automatically" on for the lab SSID |
+| Phone adapter renamed after re-plugging | Re-run `Get-NetIPInterface` and use the new name below |
+
+### Optional hardening (run PowerShell as Administrator)
+
+Make the phone link the clear first choice for internet and the lab router the last.
+Replace the adapter names with yours from `Get-NetIPInterface -AddressFamily IPv4`:
+
+```powershell
+Set-NetIPInterface -InterfaceAlias "<PHONE_ADAPTER>" -AutomaticMetric Disabled -InterfaceMetric 10
+Set-NetIPInterface -InterfaceAlias "<WIFI_ADAPTER>"  -AutomaticMetric Disabled -InterfaceMetric 500
+```
+
+Rollback:
+
+```powershell
+Set-NetIPInterface -InterfaceAlias "<PHONE_ADAPTER>" -AutomaticMetric Enabled
+Set-NetIPInterface -InterfaceAlias "<WIFI_ADAPTER>"  -AutomaticMetric Enabled
+```
+
+This doesn't affect lab traffic: the lab subnet's direct route is chosen first
+because it is more specific.
+
+### Don't
+
+- Don't turn on Internet Connection Sharing or bridge the two adapters. That would
+  connect the lab network to the internet.
+- Don't add routes you don't understand. If the checks above pass, you need none.
+- Don't point any tool at anything except the lab site the organizers named.
+
+### Full-chain test
+
+With both links up, in the guest/fresh Chrome profile open `http://<LAB_SITE_IP>`,
+then have Claude read the tab (`browser_get_tab_info`) and the console. The lab
+site is plain `http`, so console capture works there. Never put your own passwords
+or tokens into the lab login, and decline Chrome's "save password" prompt.
+
 ## 7. Ground rules
 
 - Only touch the lab targets the organizers named. The web/osint tools (ffuf,
@@ -168,6 +250,7 @@ so test on a real `http(s)` page, not a blank tab.
 
 | Symptom | Fix |
 |---------|-----|
+| Lab site unreachable, or internet drops with the lab Wi-Fi connected | See section 6b. Check which adapter each route uses |
 | `ECONNREFUSED` / "Couldn't reconnect opentabs" | The server isn't running. It dies on reboot or when its terminal closes. Rerun `opentabs start --background` (with the telemetry vars), then reconnect in the app |
 | `MCP clients 0` after restart | Reconnect the server in the app, or quit and reopen it |
 | `unknown command 'permissions'` | Not in v0.0.115. Use `opentabs config set tool-permission...` and `opentabs config show` |
