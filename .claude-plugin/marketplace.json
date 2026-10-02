@@ -1,0 +1,11 @@
+{
+  "name": "hack-the-campus",
+  "owner": { "name": "Hack The Campus team" },
+  "plugins": [
+    {
+      "name": "ctf-kit",
+      "description": "AI-assisted CTF toolkit (MysterionRise/ctf-kit). Unreviewed upstream plugin: read it before installing.",
+      "source": { "source": "github", "repo": "MysterionRise/ctf-kit" }
+    }
+  ]
+}
