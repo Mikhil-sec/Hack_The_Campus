@@ -1,0 +1,115 @@
+# ctf-kit — Local Setup & Benign File-Analysis Components
+
+ctf-kit (MysterionRise/ctf-kit) is an AI-assisted toolkit that integrates with
+AI coding agents and common security tools to help **analyze, solve, and
+document** CTF challenges. These notes cover installing it locally and the benign
+file-analysis components it wraps. No active external network tasks here — this
+is local install + reference.
+
+Repo: https://github.com/MysterionRise/ctf-kit
+
+## 1. Install the CLI
+
+ctf-kit installs globally via `uv` and integrates into an existing repo without
+changing its structure.
+
+```bash
+uv tool install ctf-kit --from git+https://github.com/MysterionRise/ctf-kit.git
+```
+
+(Install `uv` first if needed — see the astral-sh/uv docs.)
+
+## 2. Initialize in a challenge folder
+
+Run inside any challenge directory. It creates a hidden `.ctf` folder for
+workspace data and leaves the original challenge files untouched.
+
+```bash
+ctf init          # initialize the workspace in the current folder
+ctf here          # set competition context for the current directory
+```
+
+## 3. Install the underlying analysis tools
+
+ctf-kit orchestrates standard, open-source CLI tools. On Ubuntu/Debian the
+project documents this baseline (install only what you need):
+
+```bash
+sudo apt update
+sudo apt install -y \
+    file binwalk foremost exiftool \   # file ID, carving, metadata
+    tshark wireshark \                 # network capture analysis
+    sleuthkit \                        # disk/filesystem forensics
+    hexedit xxd \                      # hex inspection
+    gdb radare2 \                      # binary / reversing
+    hashcat john \                     # hash cracking
+    steghide                           # stego (JPEG)
+
+# Python tooling
+pip3 install volatility3 pwntools z3-solver pycryptodome
+
+# Ruby stego helper
+gem install zsteg
+```
+
+Check what ctf-kit can see:
+
+```bash
+ctf check --category stego      # list available tools in a category
+```
+
+## 4. Benign file-analysis components (what it wraps)
+
+### File metadata & identification
+- **file** — identify type via magic bytes.
+- **exiftool** — read embedded metadata (EXIF, author, timestamps, comments).
+- **binwalk** — scan for embedded files / appended data.
+- **xxd / hexedit** — raw hex inspection.
+
+### Encoding / string detection
+- **strings** — pull printable strings out of a binary/image.
+- Structured workflow (from ctf-kit's forensics notes): identify file type via
+  magic bytes → extract with binwalk/strings → inspect for encoded content
+  (base64/hex and similar) in common hiding spots.
+
+### Steganography analysis
+ctf-kit's `StegoAnalyzer` orchestrates several tools over an image:
+
+```
+IMAGE_TOOLS = ['exiftool', 'zsteg', 'steghide', 'stegsolve', 'binwalk']
+AUDIO_TOOLS = ['exiftool', 'sonic-visualizer', 'deepsound']
+```
+
+Common commands it drives:
+
+```bash
+zsteg image.png          # LSB analysis (PNG/BMP)
+zsteg -a image.png       # all combinations
+steghide extract -sf image.jpg
+exiftool image.jpg       # metadata
+binwalk image.png        # embedded files
+xxd image.png | head -50 # hex peek
+```
+
+### Forensics / archives
+- **sleuthkit** — disk & filesystem examination.
+- **volatility3** — memory-image analysis.
+- **tshark / wireshark** — pcap inspection.
+- Encrypted-ZIP workflow: list entries → known-plaintext attack where
+  applicable → fall back to hash extraction + `john` for password cracking.
+
+## 5. Orchestration patterns (from the project plan)
+
+ctf-kit documents two useful shapes:
+
+- **Sequential pipeline** — e.g. encrypted ZIP: inspect → try known-plaintext →
+  fall back to cracking.
+- **Parallel analysis** — e.g. stego image: run `zsteg`, `exiftool`, `binwalk`
+  concurrently and collect results by tool.
+
+## Notes
+
+- Everything above is local analysis of files we're given. Keep it scoped to the
+  authorized lab materials.
+- Verify commands against the upstream README/`docs/` before the event — the
+  tool list evolves.
