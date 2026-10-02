@@ -21,17 +21,28 @@ pip3 install pwntools pycryptodome z3-solver
 
 Then install ctf-kit inside WSL too (needs uv there) so `ctf check` sees the tools.
 
-## 3. OpenTabs — still to do (npm install was blocked again)
+## 3. OpenTabs — DONE (verified 2026-10-02)
+
+Server v0.0.115, Chrome extension and MCP connection in the Claude desktop app
+all work; tab info and console logs verified on `https://example.com`.
+Registration is via the repo's `.mcp.json`, which reads the token from the
+`OPENTABS_TOKEN` user env var. Do not use `claude mcp add` with a real secret.
+
+The server dies on reboot or when its terminal closes. Restart with:
 
 ```powershell
-npm install -g @opentabs-dev/cli
-opentabs start      # copy the printed auth secret
+$env:OPENTABS_TELEMETRY_DISABLED = "1"; $env:DO_NOT_TRACK = "1"
+opentabs start --background
 ```
 
-1. Chrome: `chrome://extensions` -> Developer mode -> Load unpacked -> `%USERPROFILE%\.opentabs\extension`
-2. Register with Claude Code (the `claude` CLI is not on PATH in this shell, so run it where it is available):
-   `claude mcp add --transport http opentabs http://127.0.0.1:9515/mcp --header "Authorization: Bearer <secret>"`
-3. `opentabs status` should show the extension connected.
+Full steps for teammates: [TEAM-SETUP.md](TEAM-SETUP.md).
+
+## 3b. ctf-kit plugin — DONE (verified 2026-10-02)
+
+Installed with `claude plugin marketplace add C:\Dev\Hack_The_Campus` and
+`claude plugin install ctf-kit@hack-the-campus`. The `/ctf-kit:*` commands are
+listed in new sessions. The marketplace entry clones over HTTPS (the `github`
+source used SSH and failed host-key verification).
 
 ## 4. Optional
 

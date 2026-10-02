@@ -129,12 +129,24 @@ xxd image.png | head -50 # hex peek
 
 ### Category slash-commands (agent integration)
 
-When used with an AI agent, ctf-kit exposes per-category commands, e.g.:
+With the Claude plugin installed (`ctf-kit@hack-the-campus`, see
+[TEAM-SETUP.md](TEAM-SETUP.md) step 4), ctf-kit exposes these as `/ctf-kit:*`
+commands (verified against plugin v1.1.0):
 
 ```
-/ctf.forensics analyze | memory | network | carve
-/ctf.crypto    analyze | classical | rsa | decode
+/ctf-kit:analyze     triage unknown files, detect category
+/ctf-kit:here        set context for the current challenge folder (.ctf/)
+/ctf-kit:status      challenge / competition progress
+/ctf-kit:flag        save and validate a flag
+/ctf-kit:crypto  /ctf-kit:forensics  /ctf-kit:stego  /ctf-kit:web
+/ctf-kit:pwn     /ctf-kit:reverse    /ctf-kit:osint  /ctf-kit:misc
+/ctf-kit:team-solve  /ctf-kit:compete    multi-agent modes (need
+                                         CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1)
 ```
+
+The older `/ctf.forensics` style names from the upstream README are gone. The
+`web` and `osint` skills drive active scanners: lab targets only. Most skills
+call the Linux tools from section 3, so run them where those are installed.
 
 ## 5. Orchestration patterns (from the project plan)
 
