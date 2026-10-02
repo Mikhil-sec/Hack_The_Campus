@@ -32,6 +32,10 @@ async def main():
     await agent.run()
 ```
 
+> The paths above are macOS. On Windows use e.g.
+> `C:\Program Files\Google\Chrome\Application\chrome.exe` and
+> `%LOCALAPPDATA%\Google\Chrome\User Data`.
+>
 > Connecting via `executable_path` + `user_data_dir` preserves authentication.
 > Close Chrome fully before running when attaching to a real profile. A remote
 > browser can be attached instead with `Browser(cdp_url="http://host:9222")`.

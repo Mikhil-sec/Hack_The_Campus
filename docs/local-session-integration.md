@@ -33,13 +33,47 @@ through authenticated browser sessions."
   they're cheap to read and easy to diff across steps.
 - Keeps a human in the loop: we open and authenticate the tab; the agent inspects.
 
-## Setup shape (verify against upstream before the event)
+## Setup (from upstream quick-start; requires Node.js 22+ and Chrome)
 
-1. Install the OpenTabs Chrome extension.
-2. Run the OpenTabs MCP server and register it with the agent/client.
-3. Open and sign into the challenge site in the extension's browser.
-4. Point the agent at the tab; use its read tools for console/network first
-   before any write/action tools.
+```bash
+npm install -g @opentabs-dev/cli
+opentabs start      # first run: creates ~/.opentabs/, generates an auth
+                    # secret, installs extension files, prints MCP configs
+```
+
+1. **Load the extension:** open `chrome://extensions/`, enable *Developer
+   mode*, *Load unpacked*, select `~/.opentabs/extension/`. It connects to the
+   server automatically.
+2. **Register with Claude Code** (use the secret printed by `opentabs start`):
+   ```bash
+   claude mcp add --transport http opentabs http://127.0.0.1:9515/mcp \
+     --header "Authorization: Bearer YOUR_SECRET_HERE"
+   ```
+3. **Check it's healthy:** `opentabs status` (server, extension, MCP clients).
+4. Open and sign into the challenge site in that Chrome, then have the agent
+   use the read tools below before any action tools.
+
+Keep the auth secret out of the repo — don't commit `~/.claude.json` or the
+`claude mcp add` command with a real secret in it.
+
+## Console and network tools
+
+- `browser_enable_network_capture` — turn on capture for a tab (the debugger
+  records network requests **and** console output).
+- `browser_get_console_logs` — read console messages; filter by level
+  (`log`, `warn`, `error`, `info`, `debug`, `all`).
+- `browser_clear_console_logs` — clear the buffer without disabling capture.
+
+## Auditing what the agent did
+
+```bash
+opentabs audit              # recent tool calls, success/failure, duration
+opentabs audit --since 1h
+opentabs logs --follow      # server logs in real time
+```
+
+The audit log persists to `~/.opentabs/audit.log` — handy for our post-event
+write-up and for confirming the agent only touched in-scope targets.
 
 ## Guardrails
 

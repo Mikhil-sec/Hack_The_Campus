@@ -25,8 +25,20 @@ Run inside any challenge directory. It creates a hidden `.ctf` folder for
 workspace data and leaves the original challenge files untouched.
 
 ```bash
-ctf init          # initialize the workspace in the current folder
-ctf here          # set competition context for the current directory
+ctf init                          # initialize a challenge folder
+ctf init --category forensics     # ...optionally with a category
+ctf init --repo                   # one-time init for a whole repo
+ctf new <name> --category <cat>   # create a new challenge folder
+```
+
+Day-to-day commands (from the upstream README):
+
+```bash
+ctf analyze <path> [--verbose]    # analyze challenge files
+ctf check [--category <cat>]      # which tools are installed
+ctf tools                         # list all tools and their status
+ctf run <tool> [args...]          # run a wrapped tool directly
+ctf writeup [--format md|html]    # generate a writeup
 ```
 
 ## 3. Install the underlying analysis tools
@@ -34,16 +46,21 @@ ctf here          # set competition context for the current directory
 ctf-kit orchestrates standard, open-source CLI tools. On Ubuntu/Debian the
 project documents this baseline (install only what you need):
 
+> **Windows note:** these are Linux packages. On our Windows machines, run
+> everything in this section inside **WSL (Ubuntu)**, including `uv` and
+> `ctf-kit` itself, so `ctf check` can see the tools.
+
 ```bash
+# file ID, carving, metadata  | network       | disk forensics | hex
 sudo apt update
 sudo apt install -y \
-    file binwalk foremost exiftool \   # file ID, carving, metadata
-    tshark wireshark \                 # network capture analysis
-    sleuthkit \                        # disk/filesystem forensics
-    hexedit xxd \                      # hex inspection
-    gdb radare2 \                      # binary / reversing
-    hashcat john \                     # hash cracking
-    steghide                           # stego (JPEG)
+    file binwalk foremost exiftool \
+    tshark wireshark \
+    sleuthkit \
+    hexedit xxd \
+    gdb radare2 \
+    hashcat john \
+    steghide
 
 # Python tooling
 pip3 install volatility3 pwntools z3-solver pycryptodome
@@ -97,6 +114,15 @@ xxd image.png | head -50 # hex peek
 - **tshark / wireshark** — pcap inspection.
 - Encrypted-ZIP workflow: list entries → known-plaintext attack where
   applicable → fall back to hash extraction + `john` for password cracking.
+
+### Category slash-commands (agent integration)
+
+When used with an AI agent, ctf-kit exposes per-category commands, e.g.:
+
+```
+/ctf.forensics analyze | memory | network | carve
+/ctf.crypto    analyze | classical | rsa | decode
+```
 
 ## 5. Orchestration patterns (from the project plan)
 
