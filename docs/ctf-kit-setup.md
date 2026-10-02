@@ -39,7 +39,19 @@ ctf check [--category <cat>]      # which tools are installed
 ctf tools                         # list all tools and their status
 ctf run <tool> [args...]          # run a wrapped tool directly
 ctf writeup [--format md|html]    # generate a writeup
+ctf here                          # set competition context for this directory
+ctf status                        # show challenge/competition status
+ctf flag                          # submit a flag for the current challenge
+ctf competition                   # manage competitions
 ```
+
+Verified locally with `ctf tools` (v0.1.0): 33 wrappers across categories
+forensics, stego, crypto, encoding, misc, reversing, pwn, osint and web. The
+web/osint wrappers (ffuf, gobuster, nikto, sqlmap, shodan, sherlock,
+theharvester) are active scanners, so point them only at the in-scope lab
+targets. The file-analysis ones used in this doc (file, strings, exiftool,
+binwalk, cyberchef) are local and passive. Only `cyberchef` showed as OK on a
+fresh Windows install.
 
 ## 3. Install the underlying analysis tools
 
